@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: helm-in-kustomize
+  # You'll usually want to add your resources to the argocd namespace.
+  namespace: argocd
+  # Add this finalizer ONLY if you want these to cascade delete.
+  finalizers:
+    # The default behaviour is foreground cascading deletion
+    - resources-finalizer.argocd.argoproj.io
+    # Alternatively, you can use background cascading deletion
+    # - resources-finalizer.argocd.argoproj.io/background
+  # Add labels to your application object.
+  labels:
+    app.kubernetes.io/name: helm-in-kustomize
+    app.kubernetes.io/version: 0.0.1
+spec:
+  # The project the application belongs to.
+  project: default
+
+  # Source of the application manifests
+  source:
+    repoURL: your-git-repo-url # Can point to either a Helm chart repo or a git repo.
+    targetRevision: HEAD # For Helm, this refers to the chart version.
+    path: path-for-a-kustomization.yaml # This has no meaning for Helm charts pulled directly from a Helm repo instead of git.
+
+    # kustomize specific config
+    kustomize:
+      # Optional kustomize version. Note: version must be configured in argocd-cm ConfigMap
+      # version: v4.5.4
+      version: v5.3.0
+      # Supported kustomize transformers. https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/
+      commonLabels:
+        app.kubernetes.io/name: helm-in-kustomize
+        app.kubernetes.io/version: 0.0.1
+  # Destination cluster and namespace to deploy the application
+  destination:
+    # cluster API URL
+    server: https://kubernetes.default.svc
+    # or cluster name
+    # name: in-cluster
+    # The namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace
+    namespace: helm-in-kustomize
+
+  # Extra information to show in the Argo CD Application details tab
+  info:
+    - name: "helm-in-kustomize"
+      value: "https://helm-in-kustomize.com"
+
+  # Sync policy
+  syncPolicy:
+    automated: # automated sync by default retries failed attempts 5 times with following delays between attempts ( 5s, 10s, 20s, 40s, 80s ); retry controlled using `retry` field.
+      prune: true # Specifies if resources should be pruned during auto-syncing ( false by default ).
+      selfHeal: true # Specifies if partial app sync should be executed when resources are changed only in target Kubernetes cluster and no git change detected ( false by default ).
+      allowEmpty: false # Allows deleting all application resources during automatic syncing ( false by default ).
+    syncOptions: # Sync options which modifies sync behavior
+      - Validate=false # disables resource validation (equivalent to 'kubectl apply --validate=false') ( true by default ).
+      - CreateNamespace=true # Namespace Auto-Creation ensures that namespace specified as the application destination exists in the destination cluster.
+      - PrunePropagationPolicy=foreground # Supported policies are background, foreground and orphan.
+      - PruneLast=true # Allow the ability for resource pruning to happen as a final, implicit wave of a sync operation
+      - RespectIgnoreDifferences=true # When syncing changes, respect fields ignored by the ignoreDifferences configuration
+      - ApplyOutOfSyncOnly=true # Only sync out-of-sync resources, rather than applying every object in the application
+

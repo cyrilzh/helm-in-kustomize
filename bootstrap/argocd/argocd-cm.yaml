@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: argo-cd
+    meta.helm.sh/release-namespace: argocd
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: argo-cd
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+    helm.sh/chart: argo-cd-4.5.0
+  name: argocd-cm
+  namespace: argocd
+data:
+  application.instanceLabelKey: argocd.argoproj.io/instance
+  kustomize.enabled: "true"
+  jsonnet.enabled: "true"
+  helm.enabled: "true"
+  kustomize.path.v5.3.0: /custom-tools/kustomize_5_3_0
+  kustomize.buildOptions.v5.3.0: --enable-helm

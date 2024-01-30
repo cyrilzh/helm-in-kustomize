@@ -1,0 +1,9 @@
+apiVersion: builtin
+kind: HelmChartInflationGenerator
+metadata:
+  name: rabbitmq
+chartHome: components/helmrepo
+releaseName: rabbitmq
+name: rabbitmq
+version: 12.6.3
+valuefile: components/helmrepo/rabbitmq/values.yaml

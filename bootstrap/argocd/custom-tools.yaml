@@ -1,0 +1,20 @@
+spec:
+  template:
+    spec:
+      volumes:
+        - name: custom-tools
+          emptyDir: {}
+      initContainers:
+        - name: get-tools
+          image: alpine:3.19.0
+          command: [sh, -c]
+          args:
+            - wget ftp://<url-to-kustomize>/kustomize -O /custom-tools/kustomize_5_3_0 && chmod +x /custom-tools/kustomize_5_3_0 # need to update the url for wget kustomize
+          volumeMounts:
+            - mountPath: /custom-tools
+              name: custom-tools
+      containers:
+        - name: repo-server
+          volumeMounts:
+            - mountPath: /custom-tools
+              name: custom-tools

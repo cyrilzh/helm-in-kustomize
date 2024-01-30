@@ -1,0 +1,7 @@
+- op: add
+  path: /additionalValuesFiles
+  value:
+    - environments/dev/configs/rabbitmq.yaml
+- op: add
+  path: /namespace
+  value: dev

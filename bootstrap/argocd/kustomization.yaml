@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - argocd-cm.yaml
+  - argocd-tls-certs-cm.yaml
+  - argocd-ssh-repo-secret.yaml
+  - argocd-ssh-known-hosts-cm.yaml
+
+secretGenerator:
+  - name: argocd-server-tls
+    files:
+      - tls/tls.crt
+      - tls/tls.key
